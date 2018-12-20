@@ -14,7 +14,13 @@
 		<div class="gaadiex-list-item-text media-body" style="padding-left: 0.5em;">
 			<h3><a href="{{url_for('user', username=user.username)}}">{{user.username.title()}}</a></h3>
 			<h4></h4>
-			<p>{{time.utcfromtimestamp(int(user.confirmed_on)).strftime('User since: %b %d, %Y')}}</p>
+			<p>
+			{% if user.confirmed_on %}
+			{{time.utcfromtimestamp(int(user.confirmed_on)).strftime('User since: %b %d, %Y')}}
+			{% else %}
+			Not verified!
+			{% endif %}
+			</p>
         </div>
 		</div>
     </div>
