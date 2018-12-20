@@ -5,6 +5,8 @@ from flask_login import UserMixin
 
 
 class User(UserMixin, db.Model):
+    """User database model
+    Stores all the users information."""
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
@@ -26,6 +28,8 @@ class User(UserMixin, db.Model):
 
 
 class Avatar(db.Model):
+    """Avatar database model
+    Stores users' avatars information."""
     id = db.Column(db.Integer, primary_key=True)
     avatar = db.Column(db.String, default='/static/avatars/0.png')
     counter = db.Column(db.Integer, default=0)
@@ -36,6 +40,8 @@ class Avatar(db.Model):
 
 
 class File(db.Model):
+    """File database model
+    Stores all the uploaded files information."""
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(128), index=True)
     repo = db.Column(db.String(7), default='public')
@@ -50,6 +56,9 @@ class File(db.Model):
 
 
 class Token(db.Model):
+    """Token database model
+    Stores information about every token generated.
+    From pagination to confirmation and resetting passwords, this database is used in everything."""
     id = db.Column(db.Integer, primary_key=True)
     token = db.Column(db.String(128), index=True)
     type = db.Column(db.String(10))
@@ -63,4 +72,9 @@ class Token(db.Model):
 
 @login.user_loader
 def load_user(id):
+    """
+    Logins user
+    :param id: User id as defined in database model.
+    :return: returns the user database.
+    """
     return User.query.get(int(id))

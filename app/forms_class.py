@@ -20,6 +20,10 @@ from os import path
 
 class Register:
     def __init__(self, form=None):
+        """
+        Processes register form
+        :param form: Register form
+        """
         # User
         user = User(username=form.username.data.lower(), email=form.email.data.lower())
         user.set_password(form.password.data)
@@ -53,9 +57,18 @@ class Register:
 
 class Login:
     def __init__(self, form=None):
+        """
+        Processes login form
+        :param form: Login form
+        """
         self.form = form
 
     def login(self, next_page=None):
+        """
+        Logs in the user
+        :param next_page: The page to redirect user after successful login
+        :return: "next_page" if user is logged in else "login.html"
+        """
         # Username & Password & Confirmation check
         user = User.query.filter_by(username=self.form.username.data.lower()).first() or \
                 User.query.filter_by(email=self.form.username.data.lower()).first()
@@ -77,6 +90,11 @@ class Login:
 
 class UserView:
     def __init__(self, username=None, id=None):
+        """
+        Processes user profile
+        :param username: Username of the user
+        :param id: Id of the user
+        """
         # Rendering the page
         self.username = username
         self.user = User.query.filter_by(username=self.username.lower()).first_or_404()
@@ -85,6 +103,11 @@ class UserView:
         self.timeuser = datetime.utcfromtimestamp(int(self.user.confirmed_on)).strftime('User since: %b %d, %Y')
 
     def action(self, action=None):
+        """
+        Processes action to be performed
+        :param action: Which action to perform
+        :return: Calls the specified action and returns results
+        """
         act = Action(user=self.user, file=self.file)
         if action == "download":
             return act.download()
@@ -96,6 +119,10 @@ class UserView:
 
 class LostPassword:
     def __init__(self, username=None):
+        """
+        Processes lost password form
+        :param username: Username of the user
+        """
         self.username = username
         self.user = User.query.filter_by(username=username.lower()).first() or User.\
             query.filter_by(email=username.lower()).first()
@@ -123,11 +150,19 @@ class LostPassword:
 
 class Reset:
     def __init__(self, token=None):
+        """
+        Processes reset form
+        :param token: Token of the reset form to be displayed
+        """
         self.token = token
         self.token_db = Token.query.filter_by(token=self.token, type="password").first()
         self.tokens = Tokens(length=0)
 
     def verify(self):
+        """
+        Verifies the token
+        :return: True of False
+        """
         check = self.tokens.auth(token_db=self.token_db)
         if check != "auth":
             return False, url_for("error", error=check)
@@ -136,6 +171,12 @@ class Reset:
             return True, user
 
     def validate(self, user=None, password=None):
+        """
+        Validates new password
+        :param user: User whose password is to be changed
+        :param password: Password to be changed to
+        :return: "login.html"
+        """
         user.set_password(password)
         db = Database(commit=True)
         flash("Password successfully changed!")
@@ -144,9 +185,17 @@ class Reset:
 
 class Upload:
     def __init__(self, form=None):
+        """
+        Processes the upload form
+        :param form: Upload form
+        """
         self.form = form
 
     def validate(self):
+        """
+        Uploads the file
+        :return: "upload.html"
+        """
         file_path = FilesPath()
 
         # Set file model attributes
@@ -200,27 +249,47 @@ class Upload:
 
 class Confirmation:
     def __init__(self, token):
+        """
+        Processes confirmation form
+        :param token: Token of the form to be processed
+        """
         self.token_db = Token.query.filter_by(token=token, type="confirmation").first()
         self.token = Tokens()
         self.auth = self.token.auth(token_db=self.token_db)
 
     def error(self):
-            return url_for("error", error=self.auth)
+        """
+        Redirects to error page with specified error
+        :return: "error.html"
+        """
+        return url_for("error", error=self.auth)
 
     def confirm(self):
-            user = self.token_db.auth
-            user.confirmed = True
-            user.confirmed_on = int(time())
-            db = Database()
-            db.add(user)
+        """
+        Confirms the account
+        :return: None
+        """
+        user = self.token_db.auth
+        user.confirmed = True
+        user.confirmed_on = int(time())
+        db = Database()
+        db.add(user)
 
 
 class AvatarView:
     def __init__(self, form=None):
+        """
+        Processes the avatar form
+        :param form: Avatar form
+        """
         self.form = form
         self.file_path = FilesPath()
 
     def validate(self):
+        """
+        Uploads the avatar
+        :return: "avatar.html"
+        """
         avatar_db = Avatar.query.filter_by(user=current_user).first()
         avatar = self.form.avatar.data
         avatar_ext = self.file_path.get_ext(filename=avatar.filename)
@@ -245,6 +314,10 @@ class AvatarView:
 
 class Editor:
     def __init__(self, token=None):
+        """
+        Processes the document form
+        :param token: token of the document to be processed
+        """
         self.token = token
         self.token_db = Token.query.filter_by(token=self.token).first()
         self.file = File.query.filter_by(id=self.token_db.file_id).first()
@@ -260,6 +333,11 @@ class Editor:
                 self.file_data = file_file.read()
 
     def validate(self, data=None):
+        """
+        Updates the document
+        :param data: Data to update
+        :return: Reloads the same page
+        """
         data = data.replace('\n', '')
         if self.file.repo == "public":
             file_path = self.files_path.public(type=self.file.type, filename=self.file_name_ext)

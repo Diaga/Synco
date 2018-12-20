@@ -11,11 +11,19 @@ from datetime import datetime
 
 @synco.route('/')
 def home():
+    """
+    Home page
+    :return: "home.html"
+    """
     return render_template('home.html', title="Synco")
 
 
 @synco.route('/register', methods=['GET', 'POST'])
 def register():
+    """
+    Registeration page
+    :return: "register.html"
+    """
     if current_user.is_authenticated:
         return redirect(url_for('home'))
     form = RegistrationForm()
@@ -27,6 +35,10 @@ def register():
 
 @synco.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Login page
+    :return: "login.html"
+    """
     if current_user.is_authenticated:
         return redirect(url_for('user', username=current_user.username))
     form = LoginForm()
@@ -38,6 +50,10 @@ def login():
 
 @synco.route('/logout')
 def logout():
+    """
+    Logouts the user
+    :return: "home.html"
+    """
     logout_user()
     return redirect(url_for('home'))
 
@@ -45,6 +61,11 @@ def logout():
 @synco.route('/users/<username>')
 @login_required
 def user(username):
+    """
+    User profile page
+    :param username: Username of the user.
+    :return: Profile page of the user with given username.
+    """
     user = UserView(username=username, id=request.args.get('id'))
     action_arg = request.args.get('action')
     action = user.action(action=action_arg)
@@ -60,6 +81,10 @@ def user(username):
 @synco.route('/upload', methods=['GET', 'POST'])
 @login_required
 def upload():
+    """
+    Upload files page
+    :return: "upload.html"
+    """
     form = FileUploadForm()
     if form.validate_on_submit():
         upload = Upload(form=form)
@@ -70,17 +95,29 @@ def upload():
 @synco.route('/user')
 @login_required
 def users():
+    """
+    Lists of users page
+    :return: "users.html"
+    """
     time = datetime
     return render_template('users.html', time=datetime, int=int, title="Members - Synco", users=User.query.all())
 
 
 @synco.route('/about')
 def about():
+    """
+    About page
+    :return: "about.html"
+    """
     return render_template('about.html', title="About - Synco")
 
 
 @synco.route('/lost-password', methods=['GET', 'POST'])
 def lost_password():
+    """
+    Lost password page
+    :return: "lost-password.html"
+    """
     if current_user.is_authenticated:
         redirect(url_for('user', username=current_user))
     else:
@@ -92,6 +129,11 @@ def lost_password():
 
 @synco.route('/reset/<token>', methods=['GET', 'POST'])
 def reset(token):
+    """
+    Reset password page.
+    :param token: Token mailed at the user's email.
+    :return: Error if invalid token else password reset form.
+    """
     if current_user.is_authenticated:
         redirect(url_for('user', username=current_user))
     else:
@@ -108,11 +150,21 @@ def reset(token):
 
 @synco.route('/error/<error>')
 def error(error):
+    """
+    Error display page
+    :param error: Type of error.
+    :return: "error.html"
+    """
     return render_template("error.html", title="Synco - Error!", error=error)
 
 
 @synco.route('/confirmation/<token>')
 def confirmation(token):
+    """
+    Confirmation account page
+    :param token: Token mailed to the registered user's email.
+    :return: "confirmation.html" if success else error.
+    """
     if current_user.is_authenticated:
         redirect(url_for('user', username=current_user))
     else:
@@ -127,6 +179,10 @@ def confirmation(token):
 @synco.route('/avatar', methods=['GET', 'POST'])
 @login_required
 def avatar():
+    """
+    Avatar upload page
+    :return: "avatar.html"
+    """
     form = AvatarUploadForm()
     if form.validate_on_submit():
         avatar = AvatarView(form=form)
@@ -137,6 +193,11 @@ def avatar():
 @synco.route('/document/<token>', methods=['GET', 'POST'])
 @login_required
 def document(token):
+    """
+    Document page
+    :param token: Token of a specific document
+    :return: "document.html"
+    """
     form = DocumentForm()
     editor = Editor(token=token)
     if form.validate_on_submit():
@@ -148,6 +209,11 @@ def document(token):
 @synco.route('/audio/<token>')
 @login_required
 def audio(token):
+    """
+    Audio page
+    :param token: Token of a specific audio
+    :return: "audio.html"
+    """
     files_path = FilesPath()
     file = Token.query.filter_by(token=token).first().file
     user = Token.query.filter_by(token=token).first().auth
@@ -162,6 +228,11 @@ def audio(token):
 @synco.route('/video/<token>')
 @login_required
 def video(token):
+    """
+    Video page
+    :param token: Token of a specific video
+    :return: "video.html"
+    """
     files_path = FilesPath()
     file = Token.query.filter_by(token=token).first().file
     user = Token.query.filter_by(token=token).first().auth
@@ -176,6 +247,11 @@ def video(token):
 @synco.route('/image/<token>')
 @login_required
 def image(token):
+    """
+    Image page
+    :param token: Token of a specific image
+    :return: "image.html"
+    """
     files_path = FilesPath()
     file = Token.query.filter_by(token=token).first().file
     user = Token.query.filter_by(token=token).first().auth
