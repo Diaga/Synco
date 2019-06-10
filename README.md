@@ -40,9 +40,5 @@ Now head over to cmd, change the directory to Synco and run the following comman
 
 	$ flask run --host=0.0.0.0
 
-# Contact us!
-Join our group to become part of a small but growing programmer's community!
-https://www.facebook.com/groups/509008306285106/
-
 # License
 Synco is open-source. Anyone can modify it and use it but a link to this git repository must be added in any thing Synco is used.
